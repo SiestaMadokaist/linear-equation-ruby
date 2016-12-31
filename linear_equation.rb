@@ -1,6 +1,7 @@
 require 'memoist'
 require 'matrix'
 require 'set'
+require 'pry'
 
 class Parameter
   attr_reader(:string)
@@ -14,6 +15,11 @@ class Parameter
 
   def positive?
     not negative?
+  end
+
+  def isign
+    return -1 if negative?
+    1
   end
 
   def regex_group
@@ -111,7 +117,7 @@ class LinearEquation
     arr = equations.map do |eq|
       unbound_variables
         .map{|v| eq.left_hand.select{|p| p.name == v }.first }
-        .map{|p| p ? p.multiplier : 0}
+        .map{|p| p ? p.isign * p.multiplier : 0}
     end
     Matrix[*arr]
   end
