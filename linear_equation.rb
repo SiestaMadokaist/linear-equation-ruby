@@ -22,11 +22,21 @@ class Parameter
     1
   end
 
-  def regex_group
+  def regex_group_with_number
     @string.match(/(?<multiplier>\d+)\.(?<name>\w+)/)
   end
 
+  def regex_group_without_number
+    @string.match(/(?<multiplier>)(?<name>[a-z]+)/)
+  end
+
+  def regex_group
+    return regex_group_with_number unless regex_group_with_number.nil?
+    return regex_group_without_number
+  end
+
   def multiplier
+    return 1 if regex_group[:multiplier].empty?
     regex_group[:multiplier].to_i
   end
 
@@ -56,9 +66,10 @@ class Equation
     @source = source
   end
 
+  VARIABLE_REGEX = /[+-]* *(?:\d+\.){0,1}[a-zA-Z]+/
   def left_hand
     source
-      .scan(/[+-]* *\d+\.\w+/)
+      .scan(VARIABLE_REGEX)
       .map{|s| Parameter.new(s)}
   end
   memoize(:left_hand)
